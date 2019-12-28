@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pat's DataCamp certificates</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/datacamp.css') }}">
+    <p></p>
+</head>
+
+<body>
+    <div id="title">
+        <h2>DataCamp Certificates</h2>
+        <a href="https://www.datacamp.com">https://www.datacamp.com/</a>
+    </div>
+
+    <div id="content">
+        <img src="{{ path_certs_wordcloud }}" alt="certs-wordcloud">
+        <ul>
+            {% for course_title in course_titles_list %}
+            <li>{{ course_title }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+
+</html>
