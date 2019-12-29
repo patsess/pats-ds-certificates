@@ -37,4 +37,14 @@ img {
 
 #content {
   line-height: 1.5;
+  margin-bottom: 100px;
+}
+
+ul {
+  margin-bottom: 40px;
+}
+
+.course_title {
+  font-size: 1.3em;
+  font-weight: 550;
 }
