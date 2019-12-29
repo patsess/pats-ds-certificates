@@ -10,7 +10,6 @@ from patsdscertificates.utils import SIMPLIFICATION_TUPLES, MULTIWORD_TUPLES
 
 __author__ = 'psessford'
 
-# TODO: add classmethod?
 # TODO: add to web app a description of how the wordcloud was made, with a link to my GitHub
 # TODO: add course descriptions to web app, using hyperlinks to separate pages
 # TODO: add to CV, and consider emailing it Markus and Chi (but maybe after I've updated more?)
@@ -19,6 +18,25 @@ __author__ = 'psessford'
 class CertificatesWordCloud(object):
     """Helper to generate a wordcloud for certificates
     """
+    @classmethod
+    def generate_wordcloud_from_data(cls, data_source='description',
+                                     method='use_entities', show_plot=True,
+                                     write_plot=False):
+        """Generate a wordcloud
+
+        :param data_source: (str) see cls.get_text_strings()
+        :param method: (str) see cls.get_words_from_texts()
+        :param show_plot: (bool) see cls.generate_wordcloud_from_words()
+        :param write_plot: (bool) see cls.generate_wordcloud_from_words()
+        """
+        from patsdscertificates.utils import read_certificates_data
+        certs_df = read_certificates_data()
+        wc = cls(certs_df=certs_df)
+        texts = wc.get_text_strings(data_source=data_source)
+        words = wc.get_words_from_texts(texts=texts, method=method)
+        wc.generate_wordcloud_from_words(
+            words=words, show_plot=show_plot, write_plot=write_plot)
+
     def __init__(self, certs_df):
         """
         :param certs_df: (pd.DataFrame) information on certificates
@@ -78,8 +96,8 @@ class CertificatesWordCloud(object):
         words = [item for sublist in words for item in sublist]
         return words
 
-    def generate_certificate_wordcloud(self, words, show_plot=True,
-                                       write_plot=False):
+    def generate_wordcloud_from_words(self, words, show_plot=True,
+                                      write_plot=False):
         """Generate a wordcloud from a list of words (or phrases)
 
         :param words: (list of str) words (or phrases) for wordcloud
@@ -166,9 +184,6 @@ class CertificatesWordCloud(object):
 
 
 if __name__ == '__main__':
-    from patsdscertificates.utils import read_certificates_data
-    certs_df = read_certificates_data()
-    wc = CertificatesWordCloud(certs_df=certs_df)
-    texts = wc.get_text_strings(data_source='description')
-    words = wc.get_words_from_texts(texts=texts, method='use_entities')
-    wc.generate_certificate_wordcloud(words=words, write_plot=False)
+    CertificatesWordCloud.generate_wordcloud_from_data(
+        data_source='description', method='use_entities', show_plot=True,
+        write_plot=False)
