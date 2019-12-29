@@ -4,7 +4,6 @@
 <head>
     <title>Pat's DataCamp certificates</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/datacamp.css') }}">
-    <p></p>
 </head>
 
 <body>
@@ -14,12 +13,14 @@
     </div>
 
     <div id="content">
-        <img src="{{ path_certs_wordcloud }}" alt="certs-wordcloud">
+        <img src="{{path_certs_wordcloud}}" alt="certs-wordcloud">
         <ul>
-            {% for course_title in course_titles_list %}
-            <li>{{ course_title }}</li>
+            {% for course in courses_list %}
+            <li>{{course|safe}}</li>
             {% endfor %}
         </ul>
+        <p align="justify">{{wordcloud_description|safe}}</p>
+        <p align="justify">{{web_app_description|safe}}</p>
     </div>
 </body>
 
