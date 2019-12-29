@@ -9,6 +9,9 @@ from patsdscertificates.utils import SIMPLIFICATION_TUPLES, MULTIWORD_TUPLES
 
 __author__ = 'psessford'
 
+# TODO: add logging
+# TODO: add classmethod?
+
 
 class CertificatesWordCloud(object):
     # TODO: docstr
@@ -16,33 +19,40 @@ class CertificatesWordCloud(object):
         # TODO: docstr
         self.certs_df = certs_df
 
-    def get_text_string(self, data_source='title'):
+        self.nlp_models = {}  # initialise
+
+    def get_text_strings(self, data_source='title'):
         # TODO: docstr
         if data_source not in self.certs_df.columns.values:
             raise ValueError('data_source must be a column of carts_df ({} '
                              'provided)'.format(data_source))
 
-        text = ' '.join(d for d in self.certs_df[data_source].values)
-        text = text.replace('\n', ' ').replace('\r', '').strip()
-        return text
+        data_source_series = (
+            self.certs_df[data_source] if data_source == 'title'
+            else self.certs_df['title'].str.cat(
+                self.certs_df[data_source], sep=': '))
 
-    def generate_certificate_wordcloud(self, text, method='simple',
-                                       show_plot=True, write_plot=False):
-        """TODO: finished docstr
+        # text = ' '.join(d for d in data_source_series.values)
+        # text = text.replace('\n', ' ').replace('\r', '').strip()
+        texts = [t.replace('\n', ' ').replace('\r', '').strip()
+                 for t in data_source_series.values]
+        return texts
 
-        :param text:
+    def get_words_from_texts(self, texts, method='simple'):
+        """TODO: finished docstr: note: a spacy model will take the tokens of the text in context, so each text should be processed separately by spacy
+
+        :param texts:
         :return:
         """
-        for unwanted_, wanted_ in SIMPLIFICATION_TUPLES:# + MULTIWORD_TUPLES:
-            text = text.replace(unwanted_, wanted_)
+        words = [
+            self._get_words_from_single_text(
+                text=text, method=method) for text in texts]
+        words = [item for sublist in words for item in sublist]
+        return words
 
-        nlp = CertificatesWordCloud._get_spacy_nlp(method=method)
-        doc = nlp(text)
-        words = CertificatesWordCloud._get_words_list(doc=doc, method=method)
-
-        for wanted_word, unwanted_word in MULTIWORD_TUPLES:
-            words = [wanted_word if w == unwanted_word else w for w in words]
-
+    def generate_certificate_wordcloud(self, words, show_plot=True,
+                                       write_plot=False):
+        # TODO: docstr
         # wordcloud = WordCloud(
         #     stopwords=stopwords, background_color='white').generate(text)
 
@@ -64,16 +74,31 @@ class CertificatesWordCloud(object):
         # TODO: update to use cross-platform Path
         return path_to_wordcloud
 
-    @staticmethod
-    def _get_spacy_nlp(method):
+    def _get_words_from_single_text(self, text, method='simple'):
+        for unwanted_, wanted_ in SIMPLIFICATION_TUPLES:# + MULTIWORD_TUPLES:
+            text = text.replace(unwanted_, wanted_)
+
+        nlp = self._get_spacy_nlp(method=method)
+        doc = nlp(text)
+        words = CertificatesWordCloud._get_words_list(doc=doc, method=method)
+
+        for wanted_word, unwanted_word in MULTIWORD_TUPLES:
+            words = [wanted_word if w == unwanted_word else w for w in words]
+
+        return words
+
+    def _get_spacy_nlp(self, method):
         if method == 'simple':
-            nlp = spacy.load('en_core_web_sm')
+            model_name = 'en_core_web_sm'
         elif method == 'use_entities':
-            nlp = spacy.load('en_core_web_lg')
+            # model_name = 'en_core_web_lg'
+            model_name = 'en_core_web_md'
         else:
             raise ValueError('unrecognised method ({})'.format(method))
 
-        return nlp
+        self.nlp_models[method] = self.nlp_models.get(
+            method, spacy.load(model_name))
+        return self.nlp_models[method]
 
     @staticmethod
     def _get_words_list(doc, method):
@@ -103,6 +128,6 @@ if __name__ == '__main__':
     from patsdscertificates.utils import read_certificates_data
     certs_df = read_certificates_data()
     wc = CertificatesWordCloud(certs_df=certs_df)
-    text = wc.get_text_string(data_source='description')
-    wc.generate_certificate_wordcloud(
-        text=text, method='use_entities', write_plot=False)
+    texts = wc.get_text_strings(data_source='description')
+    words = wc.get_words_from_texts(texts=texts, method='use_entities')
+    wc.generate_certificate_wordcloud(words=words, write_plot=True)
