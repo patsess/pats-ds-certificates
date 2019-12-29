@@ -11,6 +11,8 @@ __author__ = 'psessford'
 
 # TODO: add logging
 # TODO: add classmethod?
+# TODO: add course descriptions to web app, using hyperlinks to separate pages
+# TODO: add to CV, and consider emailing it Markus and Chi (but maybe after I've updated more?)
 
 
 class CertificatesWordCloud(object):
