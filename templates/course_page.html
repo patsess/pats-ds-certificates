@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pat's DataCamp certificate {{course_id}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/datacamp.css') }}">
+</head>
+
+<body>
+    <div id="title">
+        <h2>{{course_title}}</h2>
+    </div>
+
+    <div id="content">
+        <h3>DataCamp's Course Description</h3>
+        <p align="justify">{{course_description}}</p>
+        <h3>My Certificate</h3>
+        <embed src="{{path_certificate}}" alt="certificate" width="100%">
+    </div>
+</body>
+
+</html>
