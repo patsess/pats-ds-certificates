@@ -1,4 +1,5 @@
 
+import logging
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,22 +10,39 @@ from patsdscertificates.utils import SIMPLIFICATION_TUPLES, MULTIWORD_TUPLES
 
 __author__ = 'psessford'
 
-# TODO: add logging
 # TODO: add classmethod?
+# TODO: add to web app a description of how the wordcloud was made, with a link to my GitHub
 # TODO: add course descriptions to web app, using hyperlinks to separate pages
 # TODO: add to CV, and consider emailing it Markus and Chi (but maybe after I've updated more?)
 
 
 class CertificatesWordCloud(object):
-    # TODO: docstr
+    """Helper to generate a wordcloud for certificates
+    """
     def __init__(self, certs_df):
-        # TODO: docstr
+        """
+        :param certs_df: (pd.DataFrame) information on certificates
+        """
         self.certs_df = certs_df
 
-        self.nlp_models = {}  # initialise
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+        self.logger.info('initialising a {} instance'
+                         .format(self.__class__.__name__))
+
+        # initialise useful attributes
+        self.nlp_models = {}
 
     def get_text_strings(self, data_source='title'):
-        # TODO: docstr
+        """Get strings of text for a wordcloud
+
+        :param data_source: (str) key word to indicate which data to get the
+            texts from (e.g. course titles or course descriptions)
+        :return texts: (list of str)
+        """
+        self.logger.info('getting text strings from data source {}'
+                         .format(data_source))
+
         if data_source not in self.certs_df.columns.values:
             raise ValueError('data_source must be a column of carts_df ({} '
                              'provided)'.format(data_source))
@@ -41,11 +59,19 @@ class CertificatesWordCloud(object):
         return texts
 
     def get_words_from_texts(self, texts, method='simple'):
-        """TODO: finished docstr: note: a spacy model will take the tokens of the text in context, so each text should be processed separately by spacy
+        """Get individual words (or phrases) from fuller texts
 
-        :param texts:
-        :return:
+        Note: a spacy model will take the tokens of the text in context, so
+        each text should be processed separately by spacy.
+
+        :param texts: (list of str) texts for a wordcloud
+        :param method: (str) key word to indicate the method for the
+            extraction of the words (or phrases)
+        :return words: (list of str) individual words (or phrases) for a
+            wordcloud
         """
+        self.logger.info('getting words from text strings using method {}'
+                         .format(method))
         words = [
             self._get_words_from_single_text(
                 text=text, method=method) for text in texts]
@@ -54,19 +80,31 @@ class CertificatesWordCloud(object):
 
     def generate_certificate_wordcloud(self, words, show_plot=True,
                                        write_plot=False):
-        # TODO: docstr
+        """Generate a wordcloud from a list of words (or phrases)
+
+        :param words: (list of str) words (or phrases) for wordcloud
+        :param show_plot: (bool) whether to show the wordcloud
+        :param write_plot: (bool) whether to save the wordcloud
+        """
+        self.logger.info('generating certificate wordcloud (with show_plot '
+                         '{}, write_plot {})'.format(show_plot, write_plot))
+
         # wordcloud = WordCloud(
         #     stopwords=stopwords, background_color='white').generate(text)
 
         frequencies = pd.Series(words).value_counts().to_dict()
+        self.logger.info('word frequencies: {}'.format(frequencies))
         wordcloud = WordCloud(background_color='white', random_state=0)
         wordcloud.generate_from_frequencies(frequencies)
 
         if show_plot:
-            CertificatesWordCloud._plot_wordcloud(wordcloud=wordcloud)
+            self._plot_wordcloud(wordcloud=wordcloud)
 
         if write_plot:
-            wordcloud.to_file(CertificatesWordCloud.get_path_to_wordcloud())
+            wordcloud_file_path = self.get_path_to_wordcloud()
+            wordcloud.to_file(wordcloud_file_path)
+            self.logger.info('written wordcloud to file {}'
+                             .format(wordcloud_file_path))
 
     @staticmethod
     def get_path_to_wordcloud():
@@ -87,6 +125,7 @@ class CertificatesWordCloud(object):
         for wanted_word, unwanted_word in MULTIWORD_TUPLES:
             words = [wanted_word if w == unwanted_word else w for w in words]
 
+        self.logger.info('words from a single text: {}'.format(words))
         return words
 
     def _get_spacy_nlp(self, method):
@@ -132,4 +171,4 @@ if __name__ == '__main__':
     wc = CertificatesWordCloud(certs_df=certs_df)
     texts = wc.get_text_strings(data_source='description')
     words = wc.get_words_from_texts(texts=texts, method='use_entities')
-    wc.generate_certificate_wordcloud(words=words, write_plot=True)
+    wc.generate_certificate_wordcloud(words=words, write_plot=False)
