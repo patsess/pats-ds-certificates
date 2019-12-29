@@ -1,0 +1,1 @@
+I used Flask to create this web app, which is light-weight web framework written in Python. To deploy the app, I used Heroku. I wrote the app largely to practice creating and deploying web apps. My repository can be found on my GitHub.
