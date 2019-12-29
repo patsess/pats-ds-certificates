@@ -6,9 +6,9 @@ __author__ = 'psessford'
 
 
 SIMPLIFICATION_TUPLES = [
-    ('nlp', 'natural language processing'),
-    ('NLP', 'Natural Language Processing'),
-    ('amazon web services', 'aws'),
+    ('natural language processing', 'NLP'),
+    ('Natural Language Processing', 'NLP'),
+    ('amazon web services', 'AWS'),
     ('Amazon Web Services', 'AWS'),
     ('keras 2.0', 'keras'),
     ('Keras 2.0', 'Keras'),
