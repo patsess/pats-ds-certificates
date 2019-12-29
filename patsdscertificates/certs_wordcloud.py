@@ -3,16 +3,11 @@ import logging
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
-# from PIL import Image
 import spacy
-from wordcloud import WordCloud, STOPWORDS#, ImageColorGenerator
+from wordcloud import WordCloud, STOPWORDS
 from patsdscertificates.utils import SIMPLIFICATION_TUPLES, MULTIWORD_TUPLES
 
 __author__ = 'psessford'
-
-# TODO: add to web app a description of how the wordcloud was made, with a link to my GitHub
-# TODO: add course descriptions to web app, using hyperlinks to separate pages
-# TODO: add to CV, and consider emailing it Markus and Chi (but maybe after I've updated more?)
 
 
 class CertificatesWordCloud(object):
@@ -184,6 +179,8 @@ class CertificatesWordCloud(object):
 
 
 if __name__ == '__main__':
+    from patsdscertificates.utils import convert_certificates_to_jpegs
+    convert_certificates_to_jpegs()
     CertificatesWordCloud.generate_wordcloud_from_data(
         data_source='description', method='use_entities', show_plot=True,
         write_plot=False)
