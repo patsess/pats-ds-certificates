@@ -123,8 +123,7 @@ class CertificatesWordCloud(object):
     def get_path_to_wordcloud():
         module_path = str(Path(__file__).absolute().parent.parent)
         path_to_wordcloud = (
-            module_path + '/static/images/certs_wordcloud.png')
-        # TODO: update to use cross-platform Path
+            Path(module_path + '/static/images/') / 'certs_wordcloud.png')
         return path_to_wordcloud
 
     def _get_words_from_single_text(self, text, method='simple'):

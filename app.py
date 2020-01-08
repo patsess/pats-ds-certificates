@@ -28,8 +28,7 @@ def main_page():
 
     :return: **a rendered Flask template**
     """
-    path_certs_wordcloud = '/static/images/certs_wordcloud.png'
-    # TODO: use Path (and in course_page())
+    path_certs_wordcloud = Path('/static/images/') / 'certs_wordcloud.png'
     certs_df = read_certificates_data()
 
     courses_list = _get_courses_list(certs_df=certs_df)
@@ -54,8 +53,8 @@ def course_page(course_id):
     certs_df = read_certificates_data()
     # TODO: pass all required data over instead of reading it again?
     course_dict = certs_df.loc[int(course_id), :].to_dict()
-    path_certificate = ('/static/datacamp_certificates/{}.jpeg'
-                        .format(course_dict['certificate_id']))
+    path_certificate = (Path('/static/datacamp_certificates/') /
+                        '{}.jpeg'.format(course_dict['certificate_id']))
     return render_template(
         'course_page.html',
         course_id=course_id,
@@ -84,7 +83,8 @@ def _get_course_title_html(course_id, course_title):
 
 
 def _get_wordcloud_description():
-    with open('static/texts/wordcloud_description.txt', 'r') as f:
+    file_path = Path('static/texts/') / 'wordcloud_description.txt'
+    with open(file_path, 'r') as f:
         wordcloud_description = f.read()
 
     github_url = ('https://github.com/patsess/pats-ds-certificates/blob/'
